@@ -1,0 +1,66 @@
+import {React,useState,useEffect} from "react";
+import { render } from "react-dom";
+import VideoRecorder from "react-video-recorder";
+import axios from 'axios';
+
+function ExamMain () {
+  const [videoBlob,setvideoBlob] = useState({type:"video/webm"})
+  console.log(videoBlob)
+  var file = new File([videoBlob], "videofilecreated");
+  console.log(file)
+  
+  const formData = new FormData();
+  const extension = videoBlob.type.split('/')[1];
+  
+  const imageFile= 0
+  useEffect(() => {
+  
+  const imageFile = new File([videoBlob], `${Date.now()}.${extension}`, {
+           type: videoBlob.type,
+    });
+    
+  });
+    
+  function videoprocess() {
+  formData.append('image', imageFile);
+  axios({
+            method: 'post',
+            url: 'http://letsproctorbackend.herokuapp.com/api/video',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              
+            },
+            data: formData,
+          })
+            .then(response => {
+              console.log(response);
+            })
+            .catch(err => {
+              console.log(err);
+            });
+  };
+  
+  
+  return(
+  <>
+  <VideoRecorder
+    countdownTime={0}
+    isOnInitially
+    onRecordingComplete={(videoBlob) => {
+      // Do something with the video...
+      setvideoBlob(videoBlob)
+      videoprocess()
+      setvideoBlob({type:"video/webm"})
+      console.log("SEE its after",videoBlob)
+      
+      
+      
+    }}
+    
+  />
+  
+  </>
+  )
+  };
+
+export default ExamMain;
